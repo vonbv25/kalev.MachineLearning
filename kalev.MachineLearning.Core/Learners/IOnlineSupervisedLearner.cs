@@ -6,6 +6,6 @@ namespace kalev.MachineLearning.Core.Learners
 {
     public interface IOnlineSupervisedLearner
     {
-        void Learn(double[][] featureVectors, double[] label);
+        void Learn(double[] featureVector, double label);
     }
 }
