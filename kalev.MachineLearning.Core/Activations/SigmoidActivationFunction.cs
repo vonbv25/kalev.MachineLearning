@@ -11,9 +11,14 @@ namespace kalev.MachineLearning.Core.Activations
             return 1 / 1 + Math.Exp(-val);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="val"></param>
+        /// <returns></returns>
         public double ActivationDerivative(double val)
         {
-            throw new NotImplementedException();
+            return 0;
         }
     }
 }

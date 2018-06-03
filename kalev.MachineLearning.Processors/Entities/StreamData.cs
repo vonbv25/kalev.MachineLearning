@@ -7,6 +7,7 @@ namespace kalev.MachineLearning.Processors.Entities
     public class StreamData
     {
         private double[] featureVector;
+
         private double label;
 
         public double[] FeatureVector { get => featureVector; set => featureVector = value; }

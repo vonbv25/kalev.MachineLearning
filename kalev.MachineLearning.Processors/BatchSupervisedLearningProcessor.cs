@@ -28,9 +28,12 @@ namespace kalev.MachineLearning.Processors
         {
             BatchData data = receivedMessage;
 
-            _learner.Learn(data.FeatureVectors, data.Labels, _iterations);
+            return Task.Run(() => 
+                {
+                    _learner.Learn(data.FeatureVectors, data.Labels, _iterations);
+                } 
+            );
 
-            return Task.CompletedTask;
         }
     }
 }

@@ -1,8 +1,7 @@
 ﻿using kalev.MachineLearning.Core.Exceptions;
 using kalev.MachineLearning.Core.Models;
 using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace kalev.MachineLearning.Core.Learners
 {
@@ -30,36 +29,42 @@ namespace kalev.MachineLearning.Core.Learners
             _logCostFunc = func;
         }
 
-        public void Learn(double[][] data, double[] label, int iterations)
+        public void Learn(double[][] featureVectors, double[] label, int iterations)
         {
-
-            if(_model.Weights.Length != data[0].Length)
+            if(_model.Weights.Length != featureVectors[0].Length)
             {
                 throw new ComputationException("Feature column must equal to the number of _weights");
             }
 
+            double[] cached_weights = new double[_model.Weights.Length];
+            //Cached the weights since we will update the weights in parallel
+            Array.Copy(_model.Weights, cached_weights, _model.Weights.Length);
+
             for (int i = 0; i < iterations; i++)
             {
-                
-                for (int w = 0; w < data[0].Length; w++)
-                {
-                    double gradient = 0;
+                Parallel.For(0, _model.Weights.Length,
+                        (w) =>
+                        {
+                            double gradient = 0;
 
-                    //Iterate to all data entries
-                    for (int j = 0; j < data.Length; j++)
-                    {
-                        gradient += _model.CostFunctionDerivative(data[j], data[j][w], label[j]);
-                            //(features[j][w] * (label[j] - _model.Predict(features[j])));                        
-                    }
+                            //Iterate to all data entries
+                            for (int j = 0; j < featureVectors.Length; j++)
+                            {
+                                gradient += 
+                                _model.CostFunctionDerivative(featureVectors[j], featureVectors[j][w], label[j]);                      
+                            }
 
-                    gradient /= label.Length;
+                            gradient /= label.Length;
 
-                    gradient *= _learningRate;
+                            gradient *= _learningRate;
 
-                    _model.Weights[w] -= gradient;
-                }
+                            cached_weights[w] -= gradient;
+                        }
+                    );
 
-                _logCostFunc?.Invoke(_model.CostFunction(data, label));
+                Array.Copy(cached_weights, _model.Weights, cached_weights.Length);
+
+                _logCostFunc?.Invoke(_model.CostFunction(featureVectors, label));
             }
 
             //Save the trained model

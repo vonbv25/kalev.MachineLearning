@@ -25,9 +25,11 @@ namespace kalev.MachineLearning.Processors
         {
             StreamData data = receivedMessage;
 
-            _learner.Learn(data.FeatureVector, data.Label);
-
-            return Task.CompletedTask;
+            return Task.Run( () => 
+                {
+                    _learner.Learn(data.FeatureVector, data.Label);
+                }
+            );
         }
     }
 }
